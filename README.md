@@ -11,3 +11,7 @@ Temperature measurements are logged in a graph and can be saved to a file.
 I had to reverse engineer the serial protocol, so there might still be bugs present.
 
 Software provided as is. Contact me for more info.
+
+license
+-------
+Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0)
