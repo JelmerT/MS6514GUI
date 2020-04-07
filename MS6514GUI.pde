@@ -11,6 +11,8 @@ See README for info.
 
 import controlP5.*;              //import the Serial, and controlP5 libraries.
 import processing.serial.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 
 ControlP5 controlP5;             //Define the variable controlP5 as a ControlP5 type.
 DropdownList ports;              //Define the variable ports as a Dropdownlist.
@@ -36,20 +38,20 @@ boolean export = false;
 boolean first = true; //dirtyhack
 
 Serial port;                     //Define the variable port as a Serial object.
-int Ss;                          //The dropdown list will return a float value, which we will connvert into an int. we will use this int for that).
+int Ss;                          //The dropdown list will return  value
 String[] comList ;               //A string to hold the ports in.
 boolean serialSet;               //A value to test if we have setup the Serial port.
 boolean Comselected = false;     //A value to test if you have chosen a port in the list.
 float tien = 10;
 String csvString = new String("");
+PFont font;
 
 PrintWriter output;
 String saveLocation = new String("");
 
 void setup() {
-  //Set the size, for this example 120 by 120 px is fine.
+  font = loadFont("Digital-7Mono-48.vlw");
   size(620, 400);
-  //I dont fully understand the library and the thing with this, but monkey see monky do ;) (oh yeah and it needs this line).
   controlP5 = new ControlP5(this);
 
   myTextarea = controlP5.addTextarea("txt")
@@ -65,87 +67,87 @@ void setup() {
     .setText("88888")
       .setPosition(5, 45)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 130))
+          .setFont(font) //130
             ;
 
   T2 = controlP5.addTextlabel("T2")
     .setText("88888")
       .setPosition(315, 45)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 130))
+          .setFont(font) //130
             ;
   Time = controlP5.addTextlabel("Time")
     .setText("88:88:88")
       .setPosition(10, 145)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 65))
+          .setFont(font) //65
             ;
 
   cfk = controlP5.addTextlabel("cfk")
     .setText("CFK")
       .setPosition(255, 145)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font)  //30
             ;
   hold = controlP5.addTextlabel("hold")
     .setText("HOLD")
       .setPosition(255, 168)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   t1labelT1 = controlP5.addTextlabel("t1labelT1")
     .setText("T1")
       .setPosition(10, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   t1labelT2 = controlP5.addTextlabel("t1labelT2")
     .setText("T2")
       .setPosition(60, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   t1labelT1T2 = controlP5.addTextlabel("t1labelT1T2")
     .setText("T1-T2")
       .setPosition(105, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   t2labelT1 = controlP5.addTextlabel("t2labelT1")
     .setText("T1")
       .setPosition(355, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   t2labelT2 = controlP5.addTextlabel("t2labelT2")
     .setText("T2")
       .setPosition(405, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   MIN = controlP5.addTextlabel("MIN")
     .setText("MIN")
       .setPosition(455, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   MAX = controlP5.addTextlabel("MAX")
     .setText("MAX")
       .setPosition(505, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   AVG = controlP5.addTextlabel("AVG")
     .setText("AVG")
       .setPosition(555, 30)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   REC = controlP5.addTextlabel("REC")
     .setText("REC")
       .setPosition(405, 168)
         .setColorValue(color(128))
-          .setFont(createFont("Digital-7Mono", 30))
+          .setFont(font) //30
             ;
   graph = controlP5.addChart("graph")
     .setPosition(10, 200)
@@ -178,16 +180,19 @@ void setup() {
   graph.updateData("T2", -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, -10);
 }
 
-//The dropdown list returns the data in a way, that i dont fully understand, again mokey see monkey do. However once inside the two loops, the value (a float) can be achive via the used line ;).
 void controlEvent(ControlEvent theEvent) {
-  if (theEvent.isGroup()) 
+  if (theEvent.isController()) 
   {
+    if (theEvent.getController().getName() == "list-1"){
+    println(theEvent.getController().getName() + " => " + theEvent.getController().getValue());
     //Store the value of which box was selected, we will use this to acces a string (char array).
-    float S = theEvent.group().value();
+    Ss = int(theEvent.getController().getValue());
     //Since the list returns a float, we need to convert it to an int. For that we us the int() function.
-    Ss = int(S);
+    //Ss = int(S);
     //With this code, its a one time setup, so we state that the selection of port has been done. You could modify the code to stop the serial connection and establish a new one.
     Comselected = true;
+    println("comselected");
+    }
   }
 }
 
@@ -200,13 +205,13 @@ void customize(DropdownList ddl) {
   //Set the height of the bar itself.
   ddl.setBarHeight(15);
   //Set the lable of the bar when nothing is selected.
-  ddl.captionLabel().set("Select COM port");
+  ddl.setCaptionLabel("Select COM port");
   //Set the top margin of the lable.
-  ddl.captionLabel().style().marginTop = 3;
+  ddl.getCaptionLabel().getStyle().marginTop = 3;
   //Set the left margin of the lable.
-  ddl.captionLabel().style().marginLeft = 3;
+  ddl.getCaptionLabel().getStyle().marginLeft = 3;
   //Set the top margin of the value selected.
-  ddl.valueLabel().style().marginTop = 3;
+  ddl.getValueLabel().getStyle().marginTop = 3;
   //Store the Serial ports in the string comList (char array).
   comList = port.list();
   //We need to know how many ports there are, to know how many items to add to the list, so we will convert it to a String object (part of a class).
@@ -231,6 +236,7 @@ void customize(DropdownList ddl) {
 
 void startSerial(String[] theport)
 {
+  println("startserial");
   //When this function is called, we setup the Serial connection with the accuried values. The int Ss acesses the determins where to accsess the char array. 
   port = new Serial(this, theport[Ss], 9600);
   //Since this is a one time setup, we state that we now have set up the connection.
@@ -562,7 +568,7 @@ void draw() {
         csvString = (csvString + holdString + ",");
 
         //temp1
-        float temp1 = ((int(inBuffer[5])*255)+int(inBuffer[6]))/(tien);
+        float temp1 = ((int(inBuffer[5])*255)+int(inBuffer[6]))/(float(10));
         String strTemp1 = "" + temp1;
         if (temp1 > 200) {
           strTemp1 = "OL";
@@ -575,7 +581,7 @@ void draw() {
 
 
         //temp2
-        float temp2 = ((int(inBuffer[7])*255)+int(inBuffer[8]))/(tien);
+        float temp2 = ((int(inBuffer[7])*255)+int(inBuffer[8]))/(float(10));
         String strTemp2 = "" + temp2;
         if (temp2 > 200) {
           strTemp2 = "OL";
